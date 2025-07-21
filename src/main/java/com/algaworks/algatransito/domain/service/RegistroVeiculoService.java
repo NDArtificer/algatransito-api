@@ -2,18 +2,13 @@ package com.algaworks.algatransito.domain.service;
 
 import com.algaworks.algatransito.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algatransito.domain.exception.NegocioException;
-import com.algaworks.algatransito.domain.model.Proprietario;
-import com.algaworks.algatransito.domain.model.StatusVeiculo;
 import com.algaworks.algatransito.domain.model.Veiculo;
-import com.algaworks.algatransito.domain.repository.ProprietarioRepository;
 import com.algaworks.algatransito.domain.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Optional;
 
 import static com.algaworks.algatransito.domain.model.StatusVeiculo.REGULAR;
 
@@ -30,7 +25,7 @@ public class RegistroVeiculoService {
     public Veiculo buscar(Long id) {
         return veiculoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(
-                        String.format("O Veiculo de id #%s não existe na base!", id)));
+                        String.format("O Veiculo de id #%s não existe na base de dados!", id)));
     }
 
     @Transactional
@@ -41,10 +36,11 @@ public class RegistroVeiculoService {
         }
 
         var isPlacaInUse = veiculoRepository.findByPlaca(veiculo.getPlaca())
-                .filter(v -> !v.equals(veiculo))
-                .isPresent();
+                                                    .filter(v -> !v.equals(veiculo))
+                                                    .isPresent();
+
         if (isPlacaInUse) {
-            throw new NegocioException("Já existe uma placa cadastrada para o veículo infomado!");
+            throw new NegocioException("Já existe uma placa cadastrada para o veículo informado!");
         } else {
 
             var proprietario = proprietarioService.buscar(veiculo.getProprietario().getId());
